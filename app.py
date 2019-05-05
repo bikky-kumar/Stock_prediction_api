@@ -1,8 +1,11 @@
 from flask import Flask, jsonify, request 
-
+#pip3 install pandas
+#pip3 install sklearn
 import random, os, requests
-
-from quotes import funny_quotes 
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler(feature_range=(0, 1))
 
 
 #How to start the app in virtualenv
@@ -28,7 +31,33 @@ def serve_predection(symbol):
         # This means something went wrong.
         print(resp.status_code)
     result = resp.json()
-    dataForAllDays = result['Time Series (Daily)']    
+    dataForAllDays = result['Time Series (Daily)']
+    #converting JSON result to dataframe  
+    df = pd.DataFrame.from_dict(dataForAllDays)
+    #transposing data
+    df_transposed = df.transpose()
+    #creating a new df
+    data = pd.DataFrame(index=range(0,len(df_transposed)),columns=['Date', 'Close'])
+    data['Date'] = df_transposed.index
+    df_transposed['4. close'].apply(pd.to_numeric)
+    for i in range(0,len(data)):
+     data['Close'][i] = df_transposed['4. close'][i]
+
+    data['timestamp'] = pd.to_datetime(data.Date, format='%Y-%m-%d')
+
+    #sorting the data
+    #data = df.sort_index(ascending=True, axis=0)
+
+    #separating dates, month and year
+    data['year'] = data['timestamp'].dt.year
+    data['month'] = data['timestamp'].dt.month
+    data['dayofweek'] = data['timestamp'].dt.dayofweek
+
+    #Deleting values not required
+    data = data.drop('timestamp', axis=1)
+    data = data.drop('Date', axis=1)
+
+    print(data)
     return jsonify(dataForAllDays)   
 
 
