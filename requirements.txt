@@ -1,0 +1,6 @@
+pip install virtualenv
+pip install Flask
+pip3 install pandas
+pip3 install sklearn
+pip install keras 
+pip install tensorflow
