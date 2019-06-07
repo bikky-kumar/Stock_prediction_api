@@ -107,7 +107,9 @@ def serve_predection(symbol):
     prediction = scaler.inverse_transform(prediction)
     
     #prepearing to send JSON response back
+    #converting predicition into datframe
     prediction = pd.DataFrame(data=prediction)
+    
     serve_pred = pd.DataFrame(index=range(0,len(prediction)),columns=['Close'])
     serve_pred['Close'] = prediction[0]
     
